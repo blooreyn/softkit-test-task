@@ -64,4 +64,12 @@ public class IEXCloudService {
         }
     }
 
+    public List<QuoteDto> getQuotesByLargestValue(int limit){
+        return quoteDao.findLimitOrderByQuoteValue(limit);
+    }
+
+    public List<QuoteDto> getQuotesByLargestPercentChanges(int limit){
+        return quoteDao.findLimitOrderByChangePercent(limit);
+    }
+
 }
