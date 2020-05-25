@@ -5,4 +5,57 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
+    <changeSet id="create-table-t_quote" author="maksym_hryhoriev">
+        <createTable schemaName="public" tableName="t_quote">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="PK_QUOTE_ID"/>
+            </column>
+            <column name="latest_price" type="numeric"/>
+            <column name="latest_volume" type="numeric"/>
+            <column name="latest_update" type="numeric"/>
+            <column name="latest_time" type="varchar(256)"/>
+            <column name="calculation_price" type="varchar(256)"/>
+            <column name="latest_source" type="varchar(256)"/>
+            <column name="change" type="numeric"/>
+            <column name="change_percent" type="numeric"/>
+            <column name="volume" type="numeric"/>
+            <column name="open" type="numeric"/>
+            <column name="open_time" type="numeric"/>
+            <column name="close" type="numeric"/>
+            <column name="close_time" type="numeric"/>
+            <column name="previous_close" type="numeric"/>
+            <column name="previous_volume" type="numeric"/>
+            <column name="high" type="numeric"/>
+            <column name="low" type="numeric"/>
+            <column name="extended_price" type="numeric"/>
+            <column name="extended_change" type="numeric"/>
+            <column name="extended_change_percent" type="numeric"/>
+            <column name="extended_price_time" type="numeric"/>
+            <column name="delayed_price" type="numeric"/>
+            <column name="delayed_price_time" type="numeric"/>
+            <column name="odd_lot_delayed_price" type="numeric"/>
+            <column name="odd_lot_delayed_price_time" type="numeric"/>
+            <column name="market_cap" type="numeric"/>
+            <column name="avg_total_volume" type="numeric"/>
+            <column name="week52_high" type="numeric"/>
+            <column name="week52_low" type="numeric"/>
+            <column name="ytd_change" type="numeric"/>
+            <column name="iex_realtime_price" type="numeric"/>
+            <column name="iex_realtime_size" type="numeric"/>
+            <column name="iex_last_updated" type="numeric"/>
+            <column name="iex_market_percent" type="numeric"/>
+            <column name="iex_volume" type="numeric"/>
+            <column name="iex_bid_price" type="numeric"/>
+            <column name="iex_bid_size" type="numeric"/>
+            <column name="iex_ask_size" type="numeric"/>
+            <column name="iex_ask_price" type="numeric"/>
+            <column name="symbol" type="varchar(10)"/>
+            <column name="company_name" type="varchar(160)"/>
+            <column name="primary_exchange" type="varchar(160)"/>
+            <column name="pe_ratio" type="numeric"/>
+            <column name="last_trade_time" type="numeric"/>
+            <column name="is_us_market_open" type="boolean"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
