@@ -14,10 +14,16 @@ apply plugin: 'io.spring.dependency-management'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
     implementation("pl.zankowski:iextrading4j-all:3.3.2")
+
     implementation("org.liquibase:liquibase-core:3.6.3")
     implementation("org.postgresql:postgresql:42.2.6")
+
     implementation("de.vandermeer:asciitable:0.3.2")
+    
+    compileOnly 'org.projectlombok:lombok:1.18.8'
+    annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

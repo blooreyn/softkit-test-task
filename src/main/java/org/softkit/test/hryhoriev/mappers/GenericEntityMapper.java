@@ -1,5 +1,6 @@
 package org.softkit.test.hryhoriev.mappers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public abstract class GenericEntityMapper<E, D> implements IEntityMapper<E, D> {
     private Map<String, Field> entityFieldNamesFieldsMap;
     private List<Field> daoFields;
@@ -21,13 +23,14 @@ public abstract class GenericEntityMapper<E, D> implements IEntityMapper<E, D> {
     @Override
     public D mapEntityToDto(E entity, D dto) {
         daoFields.forEach(dtoField -> {
-            dtoField.setAccessible(true);
-            Field entityField = entityFieldNamesFieldsMap.get(dtoField.getName());
-            entityField.setAccessible(true);
             try {
+                dtoField.setAccessible(true);
+                Field entityField = entityFieldNamesFieldsMap.get(dtoField.getName());
+                entityField.setAccessible(true);
+
                 dtoField.set(dto, entityField.get(entity));
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                log.error("Fail to map entity - ({}) to dto - ({})", entity.getClass(), dto.getClass());
             }
         });
         return dto;

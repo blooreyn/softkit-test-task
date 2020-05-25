@@ -1,5 +1,6 @@
 package org.softkit.test.hryhoriev.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.softkit.test.hryhoriev.dao.QuoteDao;
 import org.softkit.test.hryhoriev.entity.QuoteDto;
 import org.softkit.test.hryhoriev.mappers.QuoteMapper;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
+@Slf4j
 public class IEXCloudService {
 
     private final AtomicLong threadTimeDelimiter = new AtomicLong(System.currentTimeMillis());
@@ -31,7 +33,9 @@ public class IEXCloudService {
     private QuoteMapper quoteMapper;
 
     public List<ExchangeSymbol> getAllTradingCompanies() {
-        return cloudClient.executeRequest(new SymbolsRequestBuilder().build());
+        List<ExchangeSymbol> exchangeSymbolList = cloudClient.executeRequest(new SymbolsRequestBuilder().build());
+        log.debug("Success load ExchangeSymbol list.List size = {}", exchangeSymbolList.size());
+        return exchangeSymbolList;
     }
 
     public void loadDataByEnabledCompanies(List<ExchangeSymbol> exchangeSymbolList) {
@@ -45,30 +49,32 @@ public class IEXCloudService {
             while ((System.currentTimeMillis() - threadTimeDelimiter.get()) < MIN_REQUEST_DELAY) {
                 Thread.sleep(MIN_REQUEST_DELAY);
             }
-            threadTimeDelimiter.set(System.currentTimeMillis());
             QuoteDto newQuote = quoteMapper.mapEntityToDto(cloudClient.executeRequest(new QuoteRequestBuilder()
                             .withSymbol(exchangeSymbol.getSymbol())
                             .build()),
                     new QuoteDto());
+            threadTimeDelimiter.set(System.currentTimeMillis());
 
+            log.debug("Success load Quote by symbol = {}", exchangeSymbol.getSymbol());
             QuoteDto quoteInDB = quoteDao.findBySymbol(newQuote.getSymbol());
-
             if (Objects.nonNull(quoteInDB)) {
                 newQuote.setId(quoteInDB.getId());
             }
             quoteDao.save(newQuote);
 
         } catch (IEXTradingException e) {
+            log.warn("Fail to load data by company {}", exchangeSymbol.getName());
             loadDateByCompany(exchangeSymbol);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            log.warn("Interrupt exception in thread for load quote data vy symbol {}", exchangeSymbol.getName());
         }
     }
 
-    public List<QuoteDto> getQuotesByLargestValue(int limit){
+    public List<QuoteDto> getQuotesByLargestValue(int limit) {
         return quoteDao.findLimitOrderByQuoteValue(limit);
     }
 
-    public List<QuoteDto> getQuotesByLargestPercentChanges(int limit){
+    public List<QuoteDto> getQuotesByLargestPercentChanges(int limit) {
         return quoteDao.findLimitOrderByChangePercent(limit);
     }
 

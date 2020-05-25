@@ -2,6 +2,7 @@ package org.softkit.test.hryhoriev.jobs;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciithemes.a7.A7_Grids;
+import lombok.extern.slf4j.Slf4j;
 import org.softkit.test.hryhoriev.service.IEXCloudService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 
 @Service
 @EnableScheduling
+@Slf4j
 public class ShowStatisticJob {
     private static final int LIMIT = 5;
     public static final String COMPANY_NAME = "Company name";
@@ -27,6 +29,7 @@ public class ShowStatisticJob {
     @Scheduled(cron = "${show.statistic.cron}")
     @Transactional(isolation = Isolation.READ_COMMITTED)
     private void showData() {
+        log.debug("Start new loop for show statistic data");
         AsciiTable gratesValueTable = new AsciiTable();
         gratesValueTable.getContext().setGrid(A7_Grids.minusBarPlusEquals());
         gratesValueTable.getContext().setWidth(90);
