@@ -1,0 +1,22 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.0.RELEASE'
+    id 'java'
+}
+
+group 'org.softkit.test'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation("pl.zankowski:iextrading4j-all:3.3.2")
+    implementation("org.liquibase:liquibase-core:3.6.3")
+    implementation("org.postgresql:postgresql:42.2.6")
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
