@@ -2,8 +2,6 @@ package org.softkit.test.hryhoriev.entity;
 
 import com.google.common.base.MoreObjects;
 import org.hibernate.annotations.Proxy;
-import org.softkit.test.hryhoriev.utils.MapperUtil;
-import pl.zankowski.iextrading4j.api.stocks.Quote;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.util.Arrays;
 
 @Entity
 @Table(name = "t_quote")
@@ -75,10 +72,6 @@ public class QuoteDto {
     private Boolean isUSMarketOpen;
 
     public QuoteDto() {
-    }
-
-    public QuoteDto(Quote quote) {
-        MapperUtil.mapEntityToDto(quote, this, Arrays.asList("id"));
     }
 
     public long getId() {

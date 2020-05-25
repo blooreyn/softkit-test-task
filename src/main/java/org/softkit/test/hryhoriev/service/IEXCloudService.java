@@ -2,6 +2,7 @@ package org.softkit.test.hryhoriev.service;
 
 import org.softkit.test.hryhoriev.dao.QuoteDao;
 import org.softkit.test.hryhoriev.entity.QuoteDto;
+import org.softkit.test.hryhoriev.mappers.QuoteMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.zankowski.iextrading4j.api.exception.IEXTradingException;
@@ -26,6 +27,9 @@ public class IEXCloudService {
     @Autowired
     private QuoteDao quoteDao;
 
+    @Autowired
+    private QuoteMapper quoteMapper;
+
     public List<ExchangeSymbol> getAllTradingCompanies() {
         return cloudClient.executeRequest(new SymbolsRequestBuilder().build());
     }
@@ -42,9 +46,10 @@ public class IEXCloudService {
                 Thread.sleep(MIN_REQUEST_DELAY);
             }
             threadTimeDelimiter.set(System.currentTimeMillis());
-            QuoteDto newQuote = new QuoteDto(cloudClient.executeRequest(new QuoteRequestBuilder()
-                    .withSymbol(exchangeSymbol.getSymbol())
-                    .build()));
+            QuoteDto newQuote = quoteMapper.mapEntityToDto(cloudClient.executeRequest(new QuoteRequestBuilder()
+                            .withSymbol(exchangeSymbol.getSymbol())
+                            .build()),
+                    new QuoteDto());
 
             QuoteDto quoteInDB = quoteDao.findBySymbol(newQuote.getSymbol());
 
