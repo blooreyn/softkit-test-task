@@ -10,8 +10,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 @Entity
 @Table(name = "t_quote")
@@ -19,9 +21,12 @@ import java.math.BigDecimal;
 public class QuoteDto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator( name = "quoteSequence", sequenceName = "QUOTE_SEQUENCE", allocationSize = 1 )
+    @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "quoteSequence")
+    @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
+    @Column(unique = true)
     private String symbol;
     private String companyName;
     private String primaryExchange;
@@ -73,7 +78,15 @@ public class QuoteDto {
     }
 
     public QuoteDto(Quote quote) {
-        MapperUtil.mapEntityToDto(quote, this);
+        MapperUtil.mapEntityToDto(quote, this, Arrays.asList("id"));
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getSymbol() {

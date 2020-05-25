@@ -58,4 +58,10 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="create-sequence-for-table-t_quote" author="maksym_hryhoriev">
+        <sql>
+        CREATE SEQUENCE QUOTE_SEQUENCE START WITH 1 INCREMENT BY 1 NO CYCLE;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
