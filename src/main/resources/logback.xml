@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <timestamp key="logTimestamp" datePattern="yyyy-MM-dd'T'HH-mm"/>
+
+    <appender name="MAIN_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/test-task${logTimestamp}.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>test-task${logTimestamp}(%i).log</fileNamePattern>
+            <maxIndex>21</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.softkit.test.hryhoriev" level="DEBUG" additivity="false">
+        <appender-ref ref="MAIN_LOG" />
+    </logger>
+
+    <root level="WARN">
+        <appender-ref ref="MAIN_LOG" />
+    </root>
+
+</configuration>
