@@ -3,6 +3,7 @@ package org.softkit.test.hryhoriev.jobs;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciithemes.a7.A7_Grids;
 import lombok.extern.slf4j.Slf4j;
+import org.softkit.test.hryhoriev.entity.QuoteDto;
 import org.softkit.test.hryhoriev.service.IEXCloudService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.function.BiConsumer;
 
 @Service
 @EnableScheduling
@@ -21,7 +24,11 @@ public class ShowStatisticJob {
     public static final String COMPANY_NAME = "Company name";
     public static final String LATEST_PRICE = "Latest price";
     public static final String PERCENT_CHANGE = "Percent change";
-
+    public static final String HIGHEST_STOCKS_VALUE_MESSAGE =
+            "The top" + LIMIT + " company by highest stocks value as of ";
+    public static final String BIGGEST_QUOTE_PERCENT_CHANGE_MESSAGE =
+            "The top " + LIMIT + " company by biggest percent change as of ";
+    private static final DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("dd/LL/yyyy HH:mm:ss");
 
     @Autowired
     private IEXCloudService iexCloudService;
@@ -30,41 +37,42 @@ public class ShowStatisticJob {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     private void showData() {
         log.debug("Start new loop for show statistic data");
-        AsciiTable gratesValueTable = new AsciiTable();
-        gratesValueTable.getContext().setGrid(A7_Grids.minusBarPlusEquals());
-        gratesValueTable.getContext().setWidth(90);
 
-        gratesValueTable.addRule();
-        gratesValueTable.addRow(COMPANY_NAME, LATEST_PRICE);
-        gratesValueTable.addRule();
-        iexCloudService.getQuotesByLargestValue(LIMIT)
-                .forEach(quote -> {
-                    gratesValueTable.addRule();
-                    gratesValueTable.addRow(quote.getCompanyName(), quote.getLatestPrice());
-                });
-        gratesValueTable.addRule();
+        showTable(HIGHEST_STOCKS_VALUE_MESSAGE + LocalDateTime.now().format(formatter),
+                new String[]{COMPANY_NAME, LATEST_PRICE}, this::addHighestQuoteValueToTable);
 
-        System.out.println("The top 5 company by highest stocks value as of " + LocalDate.now());
-        System.out.println(gratesValueTable.render());
-        System.out.println();
-
-        AsciiTable gratesChangePercentTable = new AsciiTable();
-        gratesChangePercentTable.getContext().setGrid(A7_Grids.minusBarPlusEquals());
-        gratesChangePercentTable.getContext().setWidth(90);
-
-        gratesChangePercentTable.addRule();
-        gratesChangePercentTable.addRow(COMPANY_NAME, PERCENT_CHANGE);
-        gratesChangePercentTable.addRule();
-        iexCloudService.getQuotesByLargestPercentChanges(LIMIT)
-                .forEach(quote -> {
-                    gratesChangePercentTable.addRule();
-                    gratesChangePercentTable.addRow(quote.getCompanyName(), quote.getChangePercent());
-                });
-        gratesChangePercentTable.addRule();
-
-        System.out.println("The top 5 company by highest stocks value as of " + LocalDate.now());
-        System.out.println(gratesChangePercentTable.render());
-        System.out.println();
+        showTable(BIGGEST_QUOTE_PERCENT_CHANGE_MESSAGE + LocalDateTime.now().format(formatter),
+                new String[]{COMPANY_NAME, PERCENT_CHANGE}, this::addQuoteWithBiggestPercentChangeToTable);
 
     }
+
+    private void showTable(String message, Object[] columnNames, BiConsumer<AsciiTable, QuoteDto> consumer) {
+        System.out.println(message);
+        AsciiTable asciiTable = new AsciiTable();
+        asciiTable.getContext().setGrid(A7_Grids.minusBarPlusEquals());
+        asciiTable.getContext().setWidth(90);
+
+        asciiTable.addRule();
+        asciiTable.addRow(columnNames);
+        asciiTable.addRule();
+        iexCloudService.getQuotesByLargestValue(LIMIT)
+                .forEach(quote -> {
+                    consumer.accept(asciiTable, quote);
+                });
+        asciiTable.addRule();
+        System.out.println(asciiTable.render());
+        System.out.println();
+    }
+
+    private void addHighestQuoteValueToTable(AsciiTable asciiTable, QuoteDto quote) {
+        asciiTable.addRule();
+        asciiTable.addRow(quote.getCompanyName(), quote.getLatestPrice());
+    }
+
+    private void addQuoteWithBiggestPercentChangeToTable(AsciiTable asciiTable, QuoteDto quote) {
+        asciiTable.addRule();
+        asciiTable.addRow(quote.getCompanyName(), quote.getChangePercent());
+    }
+
+
 }
