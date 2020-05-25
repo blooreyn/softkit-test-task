@@ -64,4 +64,94 @@
         </sql>
     </changeSet>
 
+
+    <changeSet id="create-table-t_quote_aud" author="maksym_hryhoriev">
+        <createTable schemaName="public" tableName="t_quote_aud">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="PK_QUOTE_AUD_ID"/>
+            </column>
+            <column name="quote_id" type="bigint">
+                <constraints foreignKeyName="FK_QUOTE_ID" referencedColumnNames="id"
+                             referencedTableName="t_quote"/>
+            </column>
+            <column name="latest_price" type="numeric"/>
+            <column name="latest_volume" type="numeric"/>
+            <column name="latest_update" type="numeric"/>
+            <column name="latest_time" type="varchar(256)"/>
+            <column name="calculation_price" type="varchar(256)"/>
+            <column name="latest_source" type="varchar(256)"/>
+            <column name="change" type="numeric"/>
+            <column name="change_percent" type="numeric"/>
+            <column name="volume" type="numeric"/>
+            <column name="open" type="numeric"/>
+            <column name="open_time" type="numeric"/>
+            <column name="close" type="numeric"/>
+            <column name="close_time" type="numeric"/>
+            <column name="previous_close" type="numeric"/>
+            <column name="previous_volume" type="numeric"/>
+            <column name="high" type="numeric"/>
+            <column name="low" type="numeric"/>
+            <column name="extended_price" type="numeric"/>
+            <column name="extended_change" type="numeric"/>
+            <column name="extended_change_percent" type="numeric"/>
+            <column name="extended_price_time" type="numeric"/>
+            <column name="delayed_price" type="numeric"/>
+            <column name="delayed_price_time" type="numeric"/>
+            <column name="odd_lot_delayed_price" type="numeric"/>
+            <column name="odd_lot_delayed_price_time" type="numeric"/>
+            <column name="market_cap" type="numeric"/>
+            <column name="avg_total_volume" type="numeric"/>
+            <column name="week52_high" type="numeric"/>
+            <column name="week52_low" type="numeric"/>
+            <column name="ytd_change" type="numeric"/>
+            <column name="iex_realtime_price" type="numeric"/>
+            <column name="iex_realtime_size" type="numeric"/>
+            <column name="iex_last_updated" type="numeric"/>
+            <column name="iex_market_percent" type="numeric"/>
+            <column name="iex_volume" type="numeric"/>
+            <column name="iex_bid_price" type="numeric"/>
+            <column name="iex_bid_size" type="numeric"/>
+            <column name="iex_ask_size" type="numeric"/>
+            <column name="iex_ask_price" type="numeric"/>
+            <column name="symbol" type="varchar(10)"/>
+            <column name="company_name" type="varchar(160)"/>
+            <column name="primary_exchange" type="varchar(160)"/>
+            <column name="pe_ratio" type="numeric"/>
+            <column name="last_trade_time" type="numeric"/>
+            <column name="is_us_market_open" type="boolean"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-sequence-for-table-t_quote_aud" author="maksym_hryhoriev">
+        <sql>
+            CREATE SEQUENCE QUOTE_AUD_SEQUENCE START WITH 1 INCREMENT BY 1 CYCLE;
+        </sql>
+    </changeSet>
+
+    <changeSet id="add-trigger-function-for-audit" author="maksym_hryhoriev">
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION public.audit() RETURNS trigger AS $$
+                 DECLARE
+                    id numeric;
+                    query text;
+            BEGIN
+                query='INSERT INTO '||TG_TABLE_NAME||'_aud SELECT $1, ($2).*';
+                id=NEXTVAL('quote_aud_sequence');
+                EXECUTE query using id,NEW;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+    </changeSet>
+
+    <changeSet id="add_trigger_for_audit-t_quote" author="maksym_hryhoriev">
+        <sql>
+            CREATE TRIGGER quote_audit
+            AFTER INSERT OR UPDATE
+            ON public.t_quote
+            FOR EACH ROW
+            EXECUTE PROCEDURE public.audit();
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

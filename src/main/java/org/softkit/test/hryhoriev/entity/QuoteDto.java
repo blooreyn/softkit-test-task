@@ -15,10 +15,10 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "t_quote")
 @Proxy(lazy = false)
+@SequenceGenerator( name = "quoteSequence", sequenceName = "QUOTE_SEQUENCE", allocationSize = 1 )
 public class QuoteDto {
 
     @Id
-    @SequenceGenerator( name = "quoteSequence", sequenceName = "QUOTE_SEQUENCE", allocationSize = 1 )
     @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "quoteSequence")
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
