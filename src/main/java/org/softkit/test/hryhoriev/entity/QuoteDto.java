@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.Proxy;
+import org.softkit.test.hryhoriev.constants.TableFields;
+import org.softkit.test.hryhoriev.constants.TableNames;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,8 +19,8 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 
 @Entity
-@SequenceGenerator( name = "quoteSequence", sequenceName = "QUOTE_SEQUENCE", allocationSize = 1 )
-@Table(name = "t_quote")
+@SequenceGenerator(name = "quoteSequence", sequenceName = "QUOTE_SEQUENCE", allocationSize = 1)
+@Table(name = TableNames.QUOTE)
 @Proxy(lazy = false)
 @Setter
 @Getter
@@ -27,9 +29,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class QuoteDto {
 
+
     @Id
-    @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "quoteSequence")
-    @Column(name = "id", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quoteSequence")
+    @Column(name = TableFields.ID , nullable = false, updatable = false)
     private long id;
 
     @Column(unique = true)
@@ -71,12 +74,12 @@ public class QuoteDto {
     private BigDecimal iexAskSize;
     private BigDecimal marketCap;
     private BigDecimal peRatio;
-    @Column(name = "week52_high")
+    @Column(name = TableFields.WEEK_52_HIGH)
     private BigDecimal week52High;
-    @Column(name = "week52_low")
+    @Column(name = TableFields.WEEK_52_LOW)
     private BigDecimal week52Low;
     private BigDecimal ytdChange;
     private Long lastTradeTime;
-    @Column(name = "is_us_market_open")
+    @Column(name = TableFields.IS_US_MARKET_OPEN)
     private Boolean isUSMarketOpen;
 }

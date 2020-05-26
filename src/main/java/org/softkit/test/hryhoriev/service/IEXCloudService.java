@@ -14,14 +14,10 @@ import pl.zankowski.iextrading4j.client.rest.request.stocks.QuoteRequestBuilder;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @Slf4j
 public class IEXCloudService {
-
-    private final AtomicLong threadTimeDelimiter = new AtomicLong(System.currentTimeMillis());
-    private static final long MIN_REQUEST_DELAY = 10L;
 
     @Autowired
     private IEXCloudClient cloudClient;
@@ -46,14 +42,10 @@ public class IEXCloudService {
 
     public void loadDateByCompany(ExchangeSymbol exchangeSymbol) {
         try {
-            while ((System.currentTimeMillis() - threadTimeDelimiter.get()) < MIN_REQUEST_DELAY) {
-                Thread.sleep(MIN_REQUEST_DELAY);
-            }
             QuoteDto newQuote = quoteMapper.mapEntityToDto(cloudClient.executeRequest(new QuoteRequestBuilder()
                             .withSymbol(exchangeSymbol.getSymbol())
                             .build()),
                     new QuoteDto());
-            threadTimeDelimiter.set(System.currentTimeMillis());
 
             log.debug("Success load Quote by symbol = {}", exchangeSymbol.getSymbol());
             QuoteDto quoteInDB = quoteDao.findBySymbol(newQuote.getSymbol());
@@ -65,8 +57,6 @@ public class IEXCloudService {
         } catch (IEXTradingException e) {
             log.warn("Fail to load data by company {}", exchangeSymbol.getName());
             loadDateByCompany(exchangeSymbol);
-        } catch (InterruptedException e) {
-            log.warn("Interrupt exception in thread for load quote data vy symbol {}", exchangeSymbol.getName());
         }
     }
 
